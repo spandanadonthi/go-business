@@ -9,60 +9,42 @@ function ReferralDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const getReferralDetails = async () => {
-    const token = Cookies.get("jwt_token");
+    const getReferralDetails = async () => {
+      const token = Cookies.get("jwt_token");
 
-    const response = await fetch(
-      `https://v9fes04dwf.execute-api.eu-north-1.amazonaws.com/api/referrals?id=${id}`,
-      {
+      const url = `https://v9fes04dwf.execute-api.eu-north-1.amazonaws.com/api/referrals?id=${id}`;
+
+      const options = {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
+      };
 
-    const data = await response.json();
+      try {
+        const response = await fetch(url, options);
+        const data = await response.json();
 
-    if (response.ok) {
-      setReferral(data.data);
-    }
-  };
-
-  getReferralDetails();
-}, [id]);
-  const getReferralDetails = async () => {
-    const token = Cookies.get("jwt_token");
-
-    const url = `https://v9fes04dwf.execute-api.eu-north-1.amazonaws.com/api/referrals?id=${id}`;
-
-    const options = {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    try {
-      const response = await fetch(url, options);
-      const data = await response.json();
-
-      if (response.ok) {
-        if (data.data.id) {
-          setReferral(data.data);
-        } else if (data.data.referrals) {
-          setReferral(data.data.referrals[0]);
+        if (response.ok) {
+          if (data.data.id) {
+            setReferral(data.data);
+          } else if (data.data.referrals) {
+            setReferral(data.data.referrals[0]);
+          } else {
+            setReferral(null);
+          }
         } else {
           setReferral(null);
         }
-      } else {
+      } catch (error) {
         setReferral(null);
       }
-    } catch (error) {
-      setReferral(null);
-    }
 
-    setLoading(false);
-  };
+      setLoading(false);
+    };
+
+    getReferralDetails();
+  }, [id]);
 
   if (loading) {
     return <h2>Loading...</h2>;
@@ -72,7 +54,6 @@ function ReferralDetails() {
     return (
       <div>
         <h1>Referral not found</h1>
-
         <Link to="/">Back to dashboard</Link>
       </div>
     );
@@ -93,8 +74,7 @@ function ReferralDetails() {
       </p>
 
       <p>
-        <strong>Date:</strong>{" "}
-        {referral.date.replace(/-/g, "/")}
+        <strong>Date:</strong> {referral.date.replace(/-/g, "/")}
       </p>
 
       <p>
