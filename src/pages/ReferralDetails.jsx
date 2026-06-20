@@ -9,9 +9,27 @@ function ReferralDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getReferralDetails();
-  }, []);
+  const getReferralDetails = async () => {
+    const token = Cookies.get("jwt_token");
 
+    const response = await fetch(
+      `https://v9fes04dwf.execute-api.eu-north-1.amazonaws.com/api/referrals?id=${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setReferral(data.data);
+    }
+  };
+
+  getReferralDetails();
+}, [id]);
   const getReferralDetails = async () => {
     const token = Cookies.get("jwt_token");
 
